@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #main {
+            width: 500px;
+            margin: 0 auto;
+            background-color: #f6f6f6;
+            padding: 10px;
+        }
+        .flex {
+            display: flex;
+
+        }
+        .flex-1 {
+            flex: 1;
+        }
+        .center {
+            text-align: center;
+        }
+        .bold {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <p class="center bold">THÔNG TIN ĐẶT PHÒNG</p>
+        <div class="flex">
+            <div class="flex-1">
+                <p>Ngày đến</p>
+                <p>Ngày đi</p>
+                <p>Phòng</p>
+                <p>Số người ở</p>
+            </div>
+            <div class="flex-1">
+                <p>: {{ from }}</p>
+                <p>: {{ to }}</p>
+                <p>: {{ code }}</p>
+                <p>: {{ quantity }}</p>
+            </div>
+        </div>
+        <p>-------------------------------</p>
+        <div class="flex">
+            <div class="flex-1">
+                <p>Tên</p>
+                <p>SĐT</p>
+                <p>Email</p>
+            </div>
+            <div class="flex-1">
+                <p>: {{ username }}</p>
+                <p>: {{ phone }}</p>
+                <p>: {{ email }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
