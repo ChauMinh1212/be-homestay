@@ -40,7 +40,7 @@ import * as moment from 'moment-timezone';
     MailerModule.forRoot({
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
       template: {
-        dir: process.cwd() + '/src/templates/',
+        dir: process.cwd() + process.env.TEMPLATES_DIR,
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,
