@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+// import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
@@ -13,7 +13,7 @@ import { UserEntity } from '../user/entities/user.entity';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(CACHE_MANAGER) private readonly redis: Cache,
+    // @Inject(CACHE_MANAGER) private readonly redis: Cache,
     @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
     private readonly mailingService: MailingService,
     private readonly jwtService: JwtService

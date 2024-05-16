@@ -1,0 +1,34 @@
+version: '3'
+services:
+  b-info-be:
+    image: chauminh1212/sirena-be:0.0.1
+    deploy:
+      replicas: 1
+    ports:
+      - '3002:3002'
+    environment:
+      - PORT_SERVER=3002
+      - PREFIX=api/v1
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_USER_NAME=postgres
+      - DB_PASSWORD=admin123
+      - DB_NAME=postgres
+      - REDIS_HOST=localhost
+      - REDIS_PORT=localhost
+      - REDIS_PASSWORD=admin123
+      - REDIS_DB=0
+      - MAIL=chauminh.12122000@gmail.com
+      - MAIL_CLIENT_ID=831410882824-4rrqn9vijggqvljpd7l5t7kd88ejrt64.apps.googleusercontent.com
+      - MAIL_CLIENT_SECRET=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
+      - MAIL_REFRESH_TOKEN=1//04ZAsQSZdn4-HCgYIARAAGAQSNgF-L9Ir6Nk7eECJ3jYu_4IDjd0_K-h-3cowLikKLh-LwIyfjV3657SD_TvLcQSp4BXAIRpx6A
+      - JWT_ACCESS_SECRET=MofmS2TNEmSTGBiqpdsRLLpKGH1+7bfXx2qzTd6MZuoZj557IR5O9fbGfc6WSV9JjutCTctY7VcN1vnDyd7tDTpBqG8FG2t/qLMFG8JpHmhKCTd6lZhIwUKY1U2fYCheeqFOlADtNTbn0GxDfpPhkI/vYhE7TC4LkRd+DXzSw2ThE7g9pMYRQuN6wB+5SmUEmWrJJ0/q9eF0kQaW7Jazr2VVh4Hg6cimSkfTMmkmVrP0QwCvU5dvBtJj/rsZaw9KH3XGMDNDB7YQTkIeQFMy/PeLIogVbW/pqv71tBYrTLV+Vi+rpkw/AAfhadPzu5orZLncrzQgbQQcQsyu69wZRA
+      - JWT_REFRESH_SECRET=DqIaI2mSzv4tEkGaTNXRERLmegC8ZEBEKj6dUb84UXyVlbVY/F/yn3lDxLkjVmt9ufvdTyX+9nwF6SkWQlMZVD+AdaiJpzgsnL44HDDicA8ge7DITY9deXQj7uKpeQ3ysOVHO/t3k3NseuzADPnM+xS+fVUQ0slFlHKA0badTTBkNNzyIWZoheIXe3Vy1IJJ1Mu3Va73n2Rdv+NJsX0ddP7nsHKNX+H/kz7InTTudSSl5yU34uHCS3dVlbjZAxWWuuR2pSGO4/tPNT4966X6r0LHyvsLRCRaI3dN+VXCkYMHK5XD2xwdetDmh2zf8mcQyiS+LhZsrzErOUMjQfxLWw
+      - MINIO_ENDPOINT=localhost
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=MyGDmxE8xQ6WDuadzunU
+      - MINIO_SECRET_KEY=eJO9USKOrSkOQ4QFCXuGsWuo6HpUFxSsBi6OjtXD
+      - TWILIO_ACCOUNT_SID=AC756acff18770e36179020afd2cbe71d7
+      - TWILIO_AUTH_TOKEN=3b347699975aebfd989acae506977e6d
+      - TWILIO_VERIFICATION_SERVICE_SID=MGa00648829b9ef1f7d7d139a0e68f1536
+      - TWILIO_PHONE_NUMBER=+18787896622

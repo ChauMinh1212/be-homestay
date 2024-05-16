@@ -31,12 +31,12 @@ import * as moment from 'moment-timezone';
       inject: [ConfigService]
     }),
     //Redis
-    CacheModule.registerAsync({
-      imports: [ConfigOptionModule],
-      useFactory: (configService: ConfigService) => configService.configRedis(),
-      inject: [ConfigService],
-      isGlobal: true
-    }),
+    // CacheModule.registerAsync({
+    //   imports: [ConfigOptionModule],
+    //   useFactory: (configService: ConfigService) => configService.configRedis(),
+    //   inject: [ConfigService],
+    //   isGlobal: true
+    // }),
     MailerModule.forRoot({
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
       template: {
