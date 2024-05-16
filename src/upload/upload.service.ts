@@ -16,7 +16,7 @@ export class UploadService {
         file.map(item => {
           const nameFile = UtilCommonTemplate.generateId()
           const url = `${item.mimetype.split('/')[0]}/${nameFile}.${item.mimetype.split('/')[1]}`
-          urlList.push(`/${bucket}/${url}`)
+          urlList.push(`${bucket}/${url}`)
           return this.minio.client.putObject(bucket, url, item.buffer, {
             'Content-Type': item.mimetype,
             'X-Amz-Meta-Testing': 1234
@@ -34,7 +34,7 @@ export class UploadService {
 
     const bucket = parts[0];
     const url = parts.slice(1).join('/');
-
+    
     return {bucket, url}
   }
 
