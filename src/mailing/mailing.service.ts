@@ -63,8 +63,8 @@ export class MailingService {
     await this.mailerService
       .sendMail({
         transporterName: 'gmail',
-        to: 'caphe.1212200@gmail.com', // mail host
-        from: 'chauminh.12122000@gmail.com',
+        to: process.env.MAIL_HOST, // mail host
+        from: process.env.MAIL,
         subject: 'Sirena Customer Booking',
         template: 'booking',
         context: {
