@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UploadService } from 'src/upload/upload.service';
-import { CatchException } from 'src/util/exception';
+import { CatchException, ExceptionResponse } from 'src/util/exception';
 import { Repository } from "typeorm";
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -17,7 +17,7 @@ export class RoomService {
   ){}
   async findAll(){
     try {
-      const data: any = await this.roomRepo.find({order: {id: 'asc'}});
+      const data: any = await this.roomRepo.find({order: {id: 'asc'}, relations: {district: true}});
       return FindAllRoomResponse.mapToList(data)
     } catch (e) {
       throw new CatchException(e)
@@ -38,8 +38,10 @@ export class RoomService {
         select * from booked_room b inner join room r on b.room_id = r.id
       where b.quantity >= r.quantity
       )
-      select * from room where id not in (select room_id from booked_room_quantity) and capacity >= ${q.capacity}
+      select r.*, d.id as district_id, d.name as district_name from room r left join district d on d.id = r.district_id
+       where r.id not in (select room_id from booked_room_quantity) and capacity >= ${q.capacity} and district_id = ${q.district_id}
       `
+      console.log(query);
       
       const data = await this.roomRepo.query(query)
       return FindAllRoomResponse.mapToList(data)
@@ -71,10 +73,10 @@ export class RoomService {
         await this.uploadService.delete(image, 'homestay')
       }
       
-      const newImage = await this.uploadService.upload(b.img, 'homestay')
-      const {id, ...update} = b
+      const newImage = b.img ? await this.uploadService.upload(b.img, 'homestay') : []
+      const {id, district_id, ...update} = b
       
-      await this.roomRepo.update({id: b.id}, {...update, img: JSON.stringify(newImage)})
+      await this.roomRepo.update({id: b.id}, {...update, district: {id: district_id}, img: b.img ? JSON.stringify(newImage) : room.img})
       
       return new FindAllRoomResponse({
         ...room,
@@ -89,6 +91,17 @@ export class RoomService {
   async delete(id: number) {
     try {
       await this.roomRepo.delete({id})
+    } catch (e) {
+      throw new CatchException(e)
+    }
+  }
+
+  async getDetail(id: number){
+    try {
+      const room = await this.roomRepo.findOne({where: {id}, relations: {district: true}})
+      if(!room) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'room not found')
+
+      return new FindAllRoomResponse(room)
     } catch (e) {
       throw new CatchException(e)
     }

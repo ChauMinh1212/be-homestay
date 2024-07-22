@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { DistrictEntity } from "src/district/entities/district.entity";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "../../util/base.entity";
 
 @Entity('room')
@@ -45,7 +46,7 @@ export class RoomEntity extends BaseEntity {
 
     @Column({
         type: 'int',
-        default: 0 // 0 - Homestay, 1 - Apartment
+        default: 0 // 0 - Homestay, 1 - Apartment, 2 - Habour, 3 - Garden
     })
     type: number
 
@@ -66,4 +67,8 @@ export class RoomEntity extends BaseEntity {
         default: ''
     })
     color: string
+
+    @ManyToOne(() => DistrictEntity, (district) => district.id)
+    @JoinColumn({name: 'district_id'})
+    district: DistrictEntity
 }

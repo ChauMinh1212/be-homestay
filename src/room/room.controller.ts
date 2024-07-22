@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Query, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AccessTokenGuard } from 'src/auth/guard/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
@@ -25,7 +25,12 @@ export class RoomController {
   async getAllValid(@Req() req: Request, @Query() q: any, @Res() res: Response) {
     const data = await this.roomService.getAllValid(q)
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
+  }
 
+  @Get(':id')
+  async getDetailRoom(@Param() p: any, @Res() res: Response){
+    const data = await this.roomService.getDetail(p.id)
+    return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 
   @FormDataRequest()

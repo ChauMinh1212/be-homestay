@@ -15,6 +15,7 @@ import { HttpConfigModule } from './http/http.module';
 import { UserModule } from './user/user.module';
 import { RoomModule } from './room/room.module';
 import { BookingModule } from './booking/booking.module';
+import { DistrictModule } from './district/district.module';
 import * as moment from 'moment-timezone';
 
 
@@ -63,6 +64,7 @@ import * as moment from 'moment-timezone';
     UserModule,
     RoomModule,
     BookingModule,
+    DistrictModule,
   ],
   providers: [
     {

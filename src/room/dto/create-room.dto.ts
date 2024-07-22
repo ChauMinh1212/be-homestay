@@ -11,6 +11,7 @@ export class CreateRoomDto {
     color: string
     quantity: number
     capacity: number
+    district_id: number
     img: MemoryStoredFile[]
 }
 
