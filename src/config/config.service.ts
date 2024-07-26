@@ -20,12 +20,14 @@ export class ConfigService implements TypeOrmOptionsFactory {
 
   configRedis(): any {
     return {
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
+      // host: process.env.REDIS_HOST,
+      // port: process.env.REDIS_PORT,
+      // store: redisStore,
+      // db: process.env.REDIS_DB,
+      url: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/${process.env.REDIS_DB}`,
       store: redisStore,
-      db: process.env.REDIS_DB,
-      isGlobal: true
-    }
+      isGlobal: true,
+    };
   }
 
   configMinio() {
@@ -35,6 +37,6 @@ export class ConfigService implements TypeOrmOptionsFactory {
       useSSL: false,
       accessKey: process.env.MINIO_ACCESS_KEY,
       secretKey: process.env.MINIO_SECRET_KEY,
-    }
+    };
   }
 }

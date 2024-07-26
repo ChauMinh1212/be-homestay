@@ -67,21 +67,14 @@ export class RoomService {
   async update(b: UpdateRoomDto) {
     try {
       const room = await this.roomRepo.findOne({where: {id: b.id}})
-      const image = room.img != '' ? JSON.parse(room.img) : []
-
-      if(image.length != 0) {
-        await this.uploadService.delete(image, 'homestay')
-      }
-      
-      const newImage = b.img ? await this.uploadService.upload(b.img, 'homestay') : []
       const {id, district_id, ...update} = b
       
-      await this.roomRepo.update({id: b.id}, {...update, district: {id: district_id}, img: b.img ? JSON.stringify(newImage) : room.img})
+      await this.roomRepo.update({id: b.id}, {...update, district: {id: district_id}, img: b.img ? JSON.stringify(b.img) : room.img})
       
       return new FindAllRoomResponse({
         ...room,
         ...b,
-        img: JSON.stringify(newImage)
+        img: JSON.stringify(b.img)
       })
     } catch (e) {
       throw new CatchException(e)

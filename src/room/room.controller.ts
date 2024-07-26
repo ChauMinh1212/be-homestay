@@ -42,7 +42,7 @@ export class RoomController {
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 
-  @FormDataRequest()
+  // @FormDataRequest()
   @UseGuards(AccessTokenGuard)
   @Roles(1)
   @Post('update')

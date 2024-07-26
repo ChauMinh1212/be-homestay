@@ -16,6 +16,7 @@ import { UserModule } from './user/user.module';
 import { RoomModule } from './room/room.module';
 import { BookingModule } from './booking/booking.module';
 import { DistrictModule } from './district/district.module';
+import { BannerModule } from './banner/banner.module';
 import * as moment from 'moment-timezone';
 
 
@@ -32,12 +33,12 @@ import * as moment from 'moment-timezone';
       inject: [ConfigService]
     }),
     //Redis
-    // CacheModule.registerAsync({
-    //   imports: [ConfigOptionModule],
-    //   useFactory: (configService: ConfigService) => configService.configRedis(),
-    //   inject: [ConfigService],
-    //   isGlobal: true
-    // }),
+    CacheModule.registerAsync({
+      imports: [ConfigOptionModule],
+      useFactory: (configService: ConfigService) => configService.configRedis(),
+      inject: [ConfigService],
+      isGlobal: true
+    }),
     MailerModule.forRoot({
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
       template: {
@@ -65,6 +66,7 @@ import * as moment from 'moment-timezone';
     RoomModule,
     BookingModule,
     DistrictModule,
+    BannerModule,
   ],
   providers: [
     {
