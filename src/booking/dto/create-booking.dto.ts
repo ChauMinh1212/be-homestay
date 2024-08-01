@@ -4,3 +4,7 @@ export class CreateBookingDto {
     to: string
     quantity: number
 }
+
+export class CreateBookingAdminDto extends CreateBookingDto {
+    user_id: number
+}

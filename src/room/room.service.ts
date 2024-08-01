@@ -29,10 +29,10 @@ export class RoomService {
       const query = `
       with booked_room as (
       select room_id, count(room_id) as quantity from booking b
-      where ('${q.from}' >= b.from and '${q.to}' <= b.to)
-      or ('${q.from}' < b.from and '${q.to}' > b."from" and '${q.to}' <= b."to")
-      or ('${q.to}' > b.to and '${q.from}' < b.to and '${q.from}' >= b."from")
-      or ('${q.from}' < b.from and '${q.to}' > b.to)
+      where ('${q.from} ${q.timeFrom}' >= b.from and '${q.to} ${q.timeTo}' <= b.to)
+      or ('${q.from} ${q.timeFrom}' < b.from and '${q.to} ${q.timeTo}' > b."from" and '${q.to} ${q.timeTo}' <= b."to")
+      or ('${q.to} ${q.timeTo}' > b.to and '${q.from} ${q.timeFrom}' < b.to and '${q.from} ${q.timeFrom}' >= b."from")
+      or ('${q.from} ${q.timeFrom}' < b.from and '${q.to} ${q.timeTo}' > b.to)
       group by room_id),
       booked_room_quantity as (
         select * from booked_room b inner join room r on b.room_id = r.id
@@ -41,7 +41,6 @@ export class RoomService {
       select r.*, d.id as district_id, d.name as district_name from room r left join district d on d.id = r.district_id
        where r.id not in (select room_id from booked_room_quantity) and capacity >= ${q.capacity} and district_id = ${q.district_id}
       `
-      console.log(query);
       
       const data = await this.roomRepo.query(query)
       return FindAllRoomResponse.mapToList(data)
