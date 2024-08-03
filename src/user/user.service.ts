@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import * as lodash from 'lodash'
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,7 @@ export class UserService {
   async findAll() {
     try {
       const user = await this.userRepo.find({ order: { created_at: 'asc' } });
-      return user;
+      return user.map(item => lodash.omit(item, ['password']));
     } catch (e) {
       throw new CatchException(e);
     }

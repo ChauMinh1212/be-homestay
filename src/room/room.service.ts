@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as moment from 'moment-timezone';
 import { UploadService } from 'src/upload/upload.service';
 import { CatchException, ExceptionResponse } from 'src/util/exception';
 import { Repository } from "typeorm";
@@ -26,13 +27,16 @@ export class RoomService {
 
   async getAllValid(q: any){
     try {
+      const timeFrom = moment(q.timeFrom, 'H:mm').subtract(1, 'hour').format('H:mm')
+      const timeTo = moment(q.timeTo, 'H:mm').add(1, 'hour').format('H:mm')
+
       const query = `
       with booked_room as (
       select room_id, count(room_id) as quantity from booking b
-      where ('${q.from} ${q.timeFrom}' >= b.from and '${q.to} ${q.timeTo}' <= b.to)
-      or ('${q.from} ${q.timeFrom}' < b.from and '${q.to} ${q.timeTo}' > b."from" and '${q.to} ${q.timeTo}' <= b."to")
-      or ('${q.to} ${q.timeTo}' > b.to and '${q.from} ${q.timeFrom}' < b.to and '${q.from} ${q.timeFrom}' >= b."from")
-      or ('${q.from} ${q.timeFrom}' < b.from and '${q.to} ${q.timeTo}' > b.to)
+      where ('${q.from} ${timeFrom}' >= b.from and '${q.to} ${timeTo}' <= b.to)
+      or ('${q.from} ${timeFrom}' < b.from and '${q.to} ${timeTo}' > b."from" and '${q.to} ${timeTo}' <= b."to")
+      or ('${q.to} ${timeTo}' > b.to and '${q.from} ${timeFrom}' < b.to and '${q.from} ${timeFrom}' >= b."from")
+      or ('${q.from} ${timeFrom}' < b.from and '${q.to} ${timeTo}' > b.to)
       group by room_id),
       booked_room_quantity as (
         select * from booked_room b inner join room r on b.room_id = r.id

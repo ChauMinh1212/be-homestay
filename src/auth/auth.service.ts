@@ -51,6 +51,7 @@ export class AuthService {
       return {
         username: new_user.username,
         email: new_user.email,
+        id: new_user.id,
         ...token,
       };
     } catch (e) {
