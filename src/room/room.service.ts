@@ -1,9 +1,10 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment-timezone';
+import { BookingEntity } from 'src/booking/entities/booking.entity';
 import { UploadService } from 'src/upload/upload.service';
 import { CatchException, ExceptionResponse } from 'src/util/exception';
-import { Repository } from "typeorm";
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { RoomEntity } from './entities/room.entity';
@@ -14,21 +15,28 @@ export class RoomService {
   constructor(
     @InjectRepository(RoomEntity)
     private readonly roomRepo: Repository<RoomEntity>,
-    private readonly uploadService: UploadService
-  ){}
-  async findAll(){
+    @InjectRepository(BookingEntity)
+    private readonly bookingRepo: Repository<BookingEntity>,
+    private readonly uploadService: UploadService,
+  ) {}
+  async findAll() {
     try {
-      const data: any = await this.roomRepo.find({order: {id: 'asc'}, relations: {district: true}});
-      return FindAllRoomResponse.mapToList(data)
+      const data: any = await this.roomRepo.find({
+        order: { id: 'asc' },
+        relations: { district: true },
+      });
+      return FindAllRoomResponse.mapToList(data);
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
-  async getAllValid(q: any){
+  async getAllValid(q: any) {
     try {
-      const timeFrom = moment(q.timeFrom, 'H:mm').subtract(1, 'hour').format('H:mm')
-      const timeTo = moment(q.timeTo, 'H:mm').add(1, 'hour').format('H:mm')
+      const timeFrom = moment(q.timeFrom, 'H:mm')
+        .subtract(1, 'hour')
+        .format('H:mm');
+      const timeTo = moment(q.timeTo, 'H:mm').add(1, 'hour').format('H:mm');
 
       const query = `
       with booked_room as (
@@ -44,62 +52,107 @@ export class RoomService {
       )
       select r.*, d.id as district_id, d.name as district_name from room r left join district d on d.id = r.district_id
        where r.id not in (select room_id from booked_room_quantity) and capacity >= ${q.capacity} and district_id = ${q.district_id}
-      `
-      
-      const data = await this.roomRepo.query(query)
-      return FindAllRoomResponse.mapToList(data)
+      `;
+
+      const data = await this.roomRepo.query(query);
+      return FindAllRoomResponse.mapToList(data);
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
-  async create(b: CreateRoomDto){
+  async getDateValid(room_id: number) {
     try {
-      const image = await this.uploadService.upload(b.img, 'homestay')
+      const now = moment().format('YYYY-MM-DD');
+
+      const room = await this.roomRepo.findOne({where: {id: room_id}})
+      if(!room) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'room not found')
+      
+      const data = await this.bookingRepo.find({
+        where: {
+          room: {id: room_id},
+          from: MoreThanOrEqual(now)
+        },
+        order: {
+          from: 'asc'
+        }
+      });
+      console.log(data);
+      const dataMapped = data.map(item => {
+        if(moment.utc(item.from).hour() == 14 && moment.utc(item.to).hour() == 12){
+          return {
+            date: moment.utc(item.from).format('DD-MM-YYYY'),
+            type: 'FULL'
+          }
+        }
+        
+      })
+      
+      // FULL - REMAINING
+      return dataMapped
+    } catch (e) {
+      throw new CatchException(e);
+    }
+  }
+
+  async create(b: CreateRoomDto) {
+    try {
+      const image = await this.uploadService.upload(b.img, 'homestay');
       const newRoom = this.roomRepo.create({
         ...b,
-        img: JSON.stringify(image)
-      } as any)
-      const data: any = await this.roomRepo.save(newRoom)
-      return new FindAllRoomResponse(data)
+        img: JSON.stringify(image),
+      } as any);
+      const data: any = await this.roomRepo.save(newRoom);
+      return new FindAllRoomResponse(data);
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
   async update(b: UpdateRoomDto) {
     try {
-      const room = await this.roomRepo.findOne({where: {id: b.id}})
-      const {id, district_id, ...update} = b
-      
-      await this.roomRepo.update({id: b.id}, {...update, district: {id: district_id}, img: b.img ? JSON.stringify(b.img) : room.img})
-      
+      const room = await this.roomRepo.findOne({ where: { id: b.id } });
+      const { id, district_id, ...update } = b;
+
+      await this.roomRepo.update(
+        { id: b.id },
+        {
+          ...update,
+          district: { id: district_id },
+          img: b.img ? JSON.stringify(b.img) : room.img,
+        },
+      );
+
       return new FindAllRoomResponse({
         ...room,
         ...b,
-        img: JSON.stringify(b.img)
-      })
+        img: JSON.stringify(b.img),
+      });
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
   async delete(id: number) {
     try {
-      await this.roomRepo.delete({id})
+      await this.roomRepo.delete({ id });
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
-  async getDetail(id: number){
+  async getDetail(id: number) {
     try {
-      const room = await this.roomRepo.findOne({where: {id}, relations: {district: true}})
-      if(!room) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'room not found')
+      const room = await this.roomRepo.findOne({
+        where: { id },
+        relations: { district: true },
+      });
+      if (!room)
+        throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'room not found');
 
-      return new FindAllRoomResponse(room)
+      return new FindAllRoomResponse(room);
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 }
