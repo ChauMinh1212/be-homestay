@@ -25,4 +25,8 @@ export class UtilCommonTemplate {
     // Tạo ra một chuỗi ID mới
     return generateId();
   }
+
+  static formatDate(date, format){
+    return moment.utc(date).format(format)
+  }
 }

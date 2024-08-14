@@ -9,6 +9,7 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { RoomEntity } from './entities/room.entity';
 import { FindAllRoomResponse } from './response/findAll.response';
+import { UtilCommonTemplate } from 'src/util/util.common';
 
 @Injectable()
 export class RoomService {
@@ -18,7 +19,7 @@ export class RoomService {
     @InjectRepository(BookingEntity)
     private readonly bookingRepo: Repository<BookingEntity>,
     private readonly uploadService: UploadService,
-  ) {}
+  ) { }
   async findAll() {
     try {
       const data: any = await this.roomRepo.find({
@@ -65,30 +66,86 @@ export class RoomService {
     try {
       const now = moment().format('YYYY-MM-DD');
 
-      const room = await this.roomRepo.findOne({where: {id: room_id}})
-      if(!room) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'room not found')
-      
+      const room = await this.roomRepo.findOne({ where: { id: room_id } })
+      if (!room) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'room not found')
+
       const data = await this.bookingRepo.find({
         where: {
-          room: {id: room_id},
+          room: { id: room_id },
           from: MoreThanOrEqual(now)
         },
         order: {
           from: 'asc'
         }
       });
+      const dataMapped = []
       console.log(data);
-      const dataMapped = data.map(item => {
-        if(moment.utc(item.from).hour() == 14 && moment.utc(item.to).hour() == 12){
-          return {
-            date: moment.utc(item.from).format('DD-MM-YYYY'),
-            type: 'FULL'
+      
+      data.map(dataItem => {
+        //Nếu from to cùng ngày
+        const findDateFrom = dataMapped.find(item => item.date == UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY'))
+        
+        const findDateTo = dataMapped.find(item => item.date == UtilCommonTemplate.formatDate(dataItem.to, 'DD/MM/YYYY'))
+        if (UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY') == UtilCommonTemplate.formatDate(dataItem.to, 'DD/MM/YYYY')) {
+          if (!findDateFrom) {
+            const newItem = {
+              date: UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY'),
+              booking: [
+                {
+                  from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
+                  to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm')
+                }
+              ]
+            }
+            dataMapped.push(newItem)
+          } else {
+            findDateFrom.booking.push({
+              from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
+              to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm')
+            })
+          }
+        } else { //Nếu khác ngày
+          if (!findDateFrom) {
+            const newItemFrom = {
+              date: UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY'),
+              booking: [
+                {
+                  from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
+                  to: '24:00'
+                }
+              ]
+            }
+
+            dataMapped.push(newItemFrom)
+          } else {
+            findDateFrom.booking.push({
+              from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
+              to: '24:00'
+            })
+          }
+          if (!findDateTo) {
+            const newItemTo = {
+              date: UtilCommonTemplate.formatDate(dataItem.to, 'DD/MM/YYYY'),
+              booking: [
+                {
+                  from: '0:00',
+                  to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm')
+                }
+              ]
+            }
+            dataMapped.push(newItemTo)
+          } else {
+            findDateTo.booking.push({
+              from: '0:00',
+              to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm')
+            })
           }
         }
-        
       })
-      
+
       // FULL - REMAINING
+      console.log(dataMapped);
+      
       return dataMapped
     } catch (e) {
       throw new CatchException(e);
@@ -155,4 +212,33 @@ export class RoomService {
       throw new CatchException(e);
     }
   }
+
+  hasThreeConsecutiveHoursFree(booking, num) {
+    // Tạo một mảng 24 phần tử, khởi tạo tất cả các phần tử là false (chưa được đặt)
+    let hours = Array(24).fill(false);
+
+    // Đánh dấu các giờ đã được đặt trong mảng booking
+    booking.forEach(b => {
+        let start = parseInt(b.from);
+        let end = parseInt(b.to);
+        for (let i = start; i < end; i++) {
+            hours[i] = true;
+        }
+    });
+
+    // Kiểm tra xem có 3 giờ trống liên tiếp không
+    let consecutiveFreeHours = 0;
+    for (let i = 0; i < 24; i++) {
+        if (!hours[i]) {
+            consecutiveFreeHours++;
+            if (consecutiveFreeHours >= num) {
+                return true;
+            }
+        } else {
+            consecutiveFreeHours = 0;
+        }
+    }
+
+    return false;
+}
 }
