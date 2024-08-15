@@ -79,7 +79,6 @@ export class RoomService {
         }
       });
       const dataMapped = []
-      console.log(data);
       
       data.map(dataItem => {
         //Nếu from to cùng ngày
