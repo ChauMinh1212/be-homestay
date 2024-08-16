@@ -15,6 +15,7 @@ export class ConfigService implements TypeOrmOptionsFactory {
       database: process.env.DB_NAME,
       entities: [join(__dirname, '/../**/**.entity{.ts,.js}')],
       synchronize: true,
+      connectTimeoutMS: 15000
     };
   }
 
