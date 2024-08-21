@@ -20,13 +20,13 @@ async function bootstrap() {
   }))
 
   const config = new DocumentBuilder()
-    .setTitle('Social Media Swagger')
-    .setDescription('The social media API description')
+    .setTitle('Sirena Homestay Swagger')
+    .setDescription('The Sirena Homestay API description')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {customSiteTitle: 'Social Media Swagger'});
+  SwaggerModule.setup('api', app, document, {customSiteTitle: 'Sirena Homestay Swagger'});
 
   await app.listen(process.env.PORT_SERVER, () => {
     console.log(`Server start at port ${process.env.PORT_SERVER}`)

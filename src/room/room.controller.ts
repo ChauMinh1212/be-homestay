@@ -9,36 +9,43 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { DeleteRoomDto } from './dto/delete-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { RoomService } from './room.service';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Room')
 @UseInterceptors(AspectLogger)
 @Controller('room')
 export class RoomController {
   constructor(private readonly roomService: RoomService) { }
 
+  @ApiOperation({summary: 'Lấy all phòng'})
   @Get()
   async getAll(@Res() res: Response) {
     const data = await this.roomService.findAll()
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 
+  @ApiOperation({summary: 'Lấy phòng valid theo ngày giờ'})
   @Get('valid')
   async getAllValid(@Query() q: any, @Res() res: Response) {
     const data = await this.roomService.getAllValid(q)
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 
+  @ApiOperation({summary: 'Lấy ngày valid của từng phòng'})
   @Get('date-valid')
   async getDateValid(@Query() q: any, @Res() res: Response) {
     const data = await this.roomService.getDateValid(+q.id)
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 
+  @ApiOperation({summary: 'Lấy chi tiết thông tin phòng'})
   @Get(':id')
   async getDetailRoom(@Param() p: any, @Res() res: Response){
     const data = await this.roomService.getDetail(p.id)
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 
+  @ApiOperation({summary: 'Tạo phòng mới'})
   @FormDataRequest()
   @UseGuards(AccessTokenGuard)
   @Roles(1)
@@ -49,6 +56,7 @@ export class RoomController {
   }
 
   // @FormDataRequest()
+  @ApiOperation({summary: 'Cập nhật phòng'})
   @UseGuards(AccessTokenGuard)
   @Roles(1)
   @Post('update')
@@ -57,6 +65,7 @@ export class RoomController {
     return res.status(HttpStatus.OK).send(new BaseResponse({data}))
   }
 
+  @ApiOperation({summary: 'Xóa phòng'})
   @UseGuards(AccessTokenGuard)
   @Roles(1)
   @Post('delete')

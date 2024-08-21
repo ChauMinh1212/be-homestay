@@ -17,6 +17,7 @@ import { RoomModule } from './room/room.module';
 import { BookingModule } from './booking/booking.module';
 import { DistrictModule } from './district/district.module';
 import { BannerModule } from './banner/banner.module';
+import { EventModule } from './event/event.module';
 import * as moment from 'moment-timezone';
 
 
@@ -67,6 +68,7 @@ import * as moment from 'moment-timezone';
     BookingModule,
     DistrictModule,
     BannerModule,
+    EventModule,
   ],
   providers: [
     {

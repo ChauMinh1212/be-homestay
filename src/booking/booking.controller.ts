@@ -19,7 +19,9 @@ import {
   CreateBookingAdminDto,
   CreateBookingDto,
 } from './dto/create-booking.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Booking')
 @UseInterceptors(AspectLogger)
 @Controller('booking')
 export class BookingController {
@@ -27,6 +29,7 @@ export class BookingController {
 
   @Post('create')
   @UseGuards(AccessTokenGuard)
+  @ApiOperation({summary: 'Khách tạo booking'})
   async create(
     @Req() req: Request,
     @Body() body: CreateBookingDto,
@@ -38,6 +41,7 @@ export class BookingController {
 
   @Post('admin-create')
   @UseGuards(AccessTokenGuard)
+  @ApiOperation({summary: 'Admin tạo booking'})
   @Roles(1)
   async createAdmin(
     @Req() req: Request,
@@ -50,6 +54,7 @@ export class BookingController {
   }
 
   @Get('history')
+  @ApiOperation({summary: 'Lịch sử booking'})
   @UseGuards(AccessTokenGuard)
   async history(@Req() req: Request, @Res() res: Response) {
     const data = await this.bookingService.history(req['user']['sub']);

@@ -5,8 +5,8 @@ import { SmsService } from './sms.service';
 export class SmsController {
   constructor(private readonly smsService: SmsService) {}
 
-  @Post()
-  async sendSMS(@Body() b: any){
-    return await this.smsService.sendSMS()
-  }
+  // @Post()
+  // async sendSMS(@Body() b: any){
+  //   return await this.smsService.sendSMS()
+  // }
 }
