@@ -1,47 +1,89 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import lodash from 'lodash';
+import * as lodash from 'lodash';
 import * as moment from 'moment';
 import { CatchException, ExceptionResponse } from 'src/util/exception';
-import { MoreThanOrEqual, Repository } from 'typeorm';
+import { MoreThanOrEqual, LessThan, Repository } from 'typeorm';
 import { CreateEventDto } from './dto/create-event.dto';
+import { QueryEventDto } from './dto/query-event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
 import { EventEntity } from './entities/event.entity';
 
 @Injectable()
 export class EventService {
   constructor(
     @InjectRepository(EventEntity)
-    private readonly eventRepo: Repository<EventEntity>
-  ) { }
+    private readonly eventRepo: Repository<EventEntity>,
+  ) {}
   async create(b: CreateEventDto) {
     try {
-      const event = this.eventRepo.create(b)
-      await this.eventRepo.save(event)
+      const event = this.eventRepo.create(b);
+      await this.eventRepo.save(event);
 
-      return event
+      return event;
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
-  async findAll() {
+  async update(b: UpdateEventDto) {
+    try {
+      const { id, ...body } = b;
+      const event = await this.eventRepo.findOne({ where: { id } });
+      if (!event)
+        throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'event not found');
+      await this.eventRepo.update({ id }, { ...body });
+    } catch (e) {
+      throw new CatchException(e);
+    }
+  }
+
+  async delete(id: number) {
+    try {
+      const event = await this.eventRepo.findOne({ where: { id } });
+      if (!event)
+        throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'event not found');
+      await this.eventRepo.delete({ id });
+    } catch (e) {
+      throw new CatchException(e);
+    }
+  }
+
+  async findAll(q: QueryEventDto) {
     try {
       const now = moment().format('YYYY-MM-DD');
-      const events = await this.eventRepo.find({ where: { to: MoreThanOrEqual(now) }, order: { from: 'asc' } })
-      return events.map(item => lodash.pick(item, ['id', 'img', 'from', 'to']))
+      const events = await this.eventRepo.find({
+        ...((!q.status || q.status != -1) && {
+          where: { to: q.status == 0 ? MoreThanOrEqual(now) : LessThan(now) },
+        }),
+        order: { from: 'asc' },
+      });
+      return events.map((item) => ({
+        ...lodash.pick(item, ['title', 'content', 'id', 'img', 'from', 'to']),
+        status: moment.utc(item.to).diff(moment(), 'day')
+        
+      }));
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
   async findOne(id: number) {
     try {
-      const event = await this.eventRepo.findOne({ where: { id } })
-      if (!event) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'event not found')
+      const event = await this.eventRepo.findOne({ where: { id } });
+      if (!event)
+        throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'event not found');
 
-      return lodash.pick(event, ['id','title', 'content', 'img', 'from', 'to'])
+      return lodash.pick(event, [
+        'id',
+        'title',
+        'content',
+        'img',
+        'from',
+        'to',
+      ]);
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 }
