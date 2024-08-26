@@ -8,6 +8,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { QueryEventDto } from './dto/query-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventEntity } from './entities/event.entity';
+import { UtilCommonTemplate } from 'src/util/util.common';
 
 @Injectable()
 export class EventService {
@@ -53,15 +54,16 @@ export class EventService {
     try {
       const now = moment().format('YYYY-MM-DD');
       const events = await this.eventRepo.find({
-        ...((!q.status || q.status != -1) && {
-          where: { to: q.status == 0 ? MoreThanOrEqual(now) : LessThan(now) },
+        ...(q.status && q.status != -1 && {
+          where: { to: q.status == 1 ? MoreThanOrEqual(now) : LessThan(now) },
         }),
-        order: { from: 'asc' },
+        order: { created_at: 'asc' },
       });
       return events.map((item) => ({
         ...lodash.pick(item, ['title', 'content', 'id', 'img', 'from', 'to']),
-        status: moment.utc(item.to).diff(moment(), 'day')
-        
+        status: moment.utc(item.to).diff(moment(), 'day'),
+        from: UtilCommonTemplate.formatDate(item.from, 'DD/MM/YYYY'),
+        to: UtilCommonTemplate.formatDate(item.to, 'DD/MM/YYYY'),
       }));
     } catch (e) {
       throw new CatchException(e);
