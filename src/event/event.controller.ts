@@ -3,6 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AccessTokenGuard } from 'src/auth/guard/auth.guard';
 import { Role, Roles } from 'src/auth/roles.decorator';
+import { IdDto } from 'src/util/dto';
 import { AspectLogger } from 'src/util/interceptor';
 import { BaseResponse } from 'src/util/response';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -37,8 +38,8 @@ export class EventController {
   @UseGuards(AccessTokenGuard)
   @Roles(Role.Admin)
   @Post('delete')
-  async delete(@Body() createEventDto: CreateEventDto, @Res() res: Response) {
-    const data = await this.eventService.create(createEventDto);
+  async delete(@Body() b: IdDto, @Res() res: Response) {
+    const data = await this.eventService.delete(b.id);
     return res.status(HttpStatus.OK).send(new BaseResponse({data}))
   } 
 

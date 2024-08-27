@@ -30,7 +30,8 @@ export class EventService {
   async update(b: UpdateEventDto) {
     try {
       const { id, ...body } = b;
-      const event = await this.eventRepo.findOne({ where: { id } });
+      const event = await this.eventRepo.findOne({ where: { id: id } });
+
       if (!event)
         throw new ExceptionResponse(HttpStatus.BAD_REQUEST, 'event not found');
       await this.eventRepo.update({ id }, { ...body });
@@ -54,9 +55,10 @@ export class EventService {
     try {
       const now = moment().format('YYYY-MM-DD');
       const events = await this.eventRepo.find({
-        ...(q.status && q.status != -1 && {
-          where: { to: q.status == 1 ? MoreThanOrEqual(now) : LessThan(now) },
-        }),
+        ...(q.status &&
+          q.status != -1 && {
+            where: { to: q.status == 1 ? MoreThanOrEqual(now) : LessThan(now) },
+          }),
         order: { created_at: 'asc' },
       });
       return events.map((item) => ({
