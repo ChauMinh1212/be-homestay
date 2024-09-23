@@ -66,6 +66,8 @@ export class RoomService {
   async getDateValid(room_id: number) {
     try {
       const now = moment().format('YYYY-MM-DD');
+      console.log();
+      
 
       const room = await this.roomRepo.findOne({ where: { id: room_id } });
       if (!room)
@@ -74,12 +76,14 @@ export class RoomService {
       const data = await this.bookingRepo.find({
         where: {
           room: { id: room_id },
-          from: MoreThanOrEqual(now),
+          // from: MoreThanOrEqual(now),
         },
         order: {
           from: 'asc',
         },
       });
+      console.log(data);
+      
       let dataMapped = [];
 
       // data.map((dataItem) => {
@@ -274,7 +278,7 @@ export class RoomService {
     for (let i = 0; i <= diff; i++) {
       if (i == 0) {
         arr.push({
-          date: moment(data.from).format('DD/MM/YYYY'),
+          date: UtilCommonTemplate.formatDate(data.from, 'DD/MM/YYYY'),
           booking: [
             {
               from: UtilCommonTemplate.formatDate(data.from, 'H:mm'),
@@ -284,7 +288,7 @@ export class RoomService {
         });
       } else if (i == diff) {
         arr.push({
-          date: moment(data.to).format('DD/MM/YYYY'),
+          date: UtilCommonTemplate.formatDate(data.to, 'DD/MM/YYYY'),
           booking: [
             {
               from: '0:00',
@@ -294,7 +298,7 @@ export class RoomService {
         })
       } else {
         arr.push({
-          date: moment(data.from).add(i, 'day').format('DD/MM/YYYY'),
+          date: moment.utc(data.to).add(i, 'day').format('DD/MM/YYYY'),
           booking: [
             {
               from: '0:00',

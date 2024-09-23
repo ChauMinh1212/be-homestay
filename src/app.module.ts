@@ -69,12 +69,6 @@ import * as moment from 'moment-timezone';
     DistrictModule,
     BannerModule,
     EventModule,
-  ],
-  providers: [
-    {
-      provide: 'moment-timezone',
-      useValue: moment.tz.setDefault('Asia/Ho_Chi_Minh'),
-    },
   ]
 })
 export class AppModule { }
