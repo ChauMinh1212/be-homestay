@@ -20,7 +20,7 @@ export class RoomService {
     @InjectRepository(BookingEntity)
     private readonly bookingRepo: Repository<BookingEntity>,
     private readonly uploadService: UploadService,
-  ) {}
+  ) { }
   async findAll() {
     try {
       const data: any = await this.roomRepo.find({
@@ -74,92 +74,20 @@ export class RoomService {
       const data = await this.bookingRepo.find({
         where: {
           room: { id: room_id },
-          // from: MoreThanOrEqual(now),
         },
         order: {
           from: 'asc',
         },
       });
-      console.log(data);
-      
+
       let dataMapped = [];
 
-      // data.map((dataItem) => {
-      //   //Nếu from to cùng ngày
-      //   const findDateFrom = dataMapped.find(
-      //     (item) =>
-      //       item.date ==
-      //       UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY'),
-      //   );
-
-      //   const findDateTo = dataMapped.find(
-      //     (item) =>
-      //       item.date ==
-      //       UtilCommonTemplate.formatDate(dataItem.to, 'DD/MM/YYYY'),
-      //   );
-      //   if (
-      //     UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY') ==
-      //     UtilCommonTemplate.formatDate(dataItem.to, 'DD/MM/YYYY')
-      //   ) {
-      //     if (!findDateFrom) {
-      //       const newItem = {
-      //         date: UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY'),
-      //         booking: [
-      //           {
-      //             from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
-      //             to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm'),
-      //           },
-      //         ],
-      //       };
-      //       dataMapped.push(newItem);
-      //     } else {
-      //       findDateFrom.booking.push({
-      //         from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
-      //         to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm'),
-      //       });
-      //     }
-      //   } else {
-      //     //Nếu khác ngày
-      //     if (!findDateFrom) {
-      //       const newItemFrom = {
-      //         date: UtilCommonTemplate.formatDate(dataItem.from, 'DD/MM/YYYY'),
-      //         booking: [
-      //           {
-      //             from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
-      //             to: '24:00',
-      //           },
-      //         ],
-      //       };
-
-      //       dataMapped.push(newItemFrom);
-      //     } else {
-      //       findDateFrom.booking.push({
-      //         from: UtilCommonTemplate.formatDate(dataItem.from, 'H:mm'),
-      //         to: '24:00',
-      //       });
-      //     }
-      //     if (!findDateTo) {
-      //       const newItemTo = {
-      //         date: UtilCommonTemplate.formatDate(dataItem.to, 'DD/MM/YYYY'),
-      //         booking: [
-      //           {
-      //             from: '0:00',
-      //             to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm'),
-      //           },
-      //         ],
-      //       };
-      //       dataMapped.push(newItemTo);
-      //     } else {
-      //       findDateTo.booking.push({
-      //         from: '0:00',
-      //         to: UtilCommonTemplate.formatDate(dataItem.to, 'H:mm'),
-      //       });
-      //     }
-      //   }
-      // });
-
       data.map(item => {
-        dataMapped = [...dataMapped, ...this.handleDate(item)]
+        const handleDate = this.handleDate(item)
+        handleDate.map(handle => {
+          const indexDate = dataMapped.findIndex(mapped => mapped.date == handle.date)
+          indexDate == -1 ? dataMapped.push(handle) : dataMapped[indexDate].booking = [...dataMapped[indexDate].booking, ...handle.booking]
+        })
       })
       return dataMapped;
     } catch (e) {
@@ -306,7 +234,7 @@ export class RoomService {
         })
       }
     }
-    
+
     return arr
   }
 }
