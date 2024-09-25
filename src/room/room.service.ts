@@ -186,7 +186,11 @@ export class RoomService {
   }
 
   handleDate(data) {
-    const diff = moment.utc(data.to).diff(data.from, 'day') + 1;
+    const dayFrom = moment.utc(data.from).day()
+    const dayTo = moment.utc(data.to).day()
+
+    const diff = dayTo - dayFrom
+    
     if (diff == 0) {
       return [
         {
