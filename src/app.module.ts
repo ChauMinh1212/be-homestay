@@ -18,6 +18,7 @@ import { BookingModule } from './booking/booking.module';
 import { DistrictModule } from './district/district.module';
 import { BannerModule } from './banner/banner.module';
 import { EventModule } from './event/event.module';
+import { ComboModule } from './combo/combo.module';
 import * as moment from 'moment-timezone';
 
 
@@ -69,6 +70,7 @@ import * as moment from 'moment-timezone';
     DistrictModule,
     BannerModule,
     EventModule,
+    ComboModule,
   ]
 })
 export class AppModule { }
