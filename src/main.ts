@@ -6,21 +6,25 @@ import { ExceptionResponse } from './util/exception';
 import { UtilCommonTemplate } from './util/util.common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {cors: {
-    origin: 'https://sirenahomestay.vn',
-    methods: 'GET, POST'
-  }});
+  const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix(process.env.PREFIX)
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    exceptionFactory(errors: ValidationError[]) {
-      return new ExceptionResponse(
-        HttpStatus.BAD_REQUEST,
-        UtilCommonTemplate.getMessageValidator(errors),
-      );
-    },
-  }))
+  app.enableCors({
+    origin: 'https://sirenahomestay.vn',
+    methods: 'GET, POST',
+  });
+
+  app.setGlobalPrefix(process.env.PREFIX);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      exceptionFactory(errors: ValidationError[]) {
+        return new ExceptionResponse(
+          HttpStatus.BAD_REQUEST,
+          UtilCommonTemplate.getMessageValidator(errors),
+        );
+      },
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Sirena Homestay Swagger')
@@ -29,11 +33,12 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {customSiteTitle: 'Sirena Homestay Swagger'});
-
-  await app.listen(process.env.PORT_SERVER, () => {
-    console.log(`Server start at port ${process.env.PORT_SERVER}`)
+  SwaggerModule.setup('api', app, document, {
+    customSiteTitle: 'Sirena Homestay Swagger',
   });
 
+  await app.listen(process.env.PORT_SERVER, () => {
+    console.log(`Server start at port ${process.env.PORT_SERVER}`);
+  });
 }
 bootstrap();
