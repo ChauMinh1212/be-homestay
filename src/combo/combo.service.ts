@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreateComboDto } from './dto/create-combo.dto';
 import { UpdateComboDto } from './dto/update-combo.dto';
+import { ComboEntity } from './entities/combo.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ComboService {
+  constructor(
+    @InjectRepository(ComboEntity)
+    private readonly comboRepo: Repository<ComboEntity>,
+  ) {}
+  
   create(createComboDto: CreateComboDto) {
     return 'This action adds a new combo';
   }

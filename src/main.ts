@@ -6,7 +6,10 @@ import { ExceptionResponse } from './util/exception';
 import { UtilCommonTemplate } from './util/util.common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {cors: true});
+  const app = await NestFactory.create(AppModule, {cors: {
+    origin: 'https://sirenahomestay.vn',
+    methods: 'GET, POST'
+  }});
 
   app.setGlobalPrefix(process.env.PREFIX)
   app.useGlobalPipes(new ValidationPipe({
