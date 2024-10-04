@@ -4,7 +4,7 @@ pipeline {
     VERSION = ""
     REPO = "chauminh1212/sirena-be"
     DOCKER_CREDENTIAL = 'e53caa92-7791-4e02-9cd5-5f60554301fe'
-    SERVER_CREDENTIAL = 'a38d3353-b170-44b5-bac3-ff29263bfa1d'
+    SERVER_CREDENTIAL = 'a38d3353-b170-44b5-bac3-ff29263bfa1d' 
   }
   stages {
     stage('Install jq') {
