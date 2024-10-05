@@ -11,7 +11,7 @@ pipeline {
       steps {
         script {
           // Cài đặt jq nếu chưa có
-          sh 'apt-get update && apt-get install -y jq'
+          sh 'apt-get update && apt-get install -y jq' 
         }
       }
     }
